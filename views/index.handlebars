@@ -1,0 +1,23 @@
+<div class="jumbotron jumbotron-fluid">
+	<div class="container">
+		<h1 class="display-3">News Scraper</h1>
+		<p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.</p>
+	</div>
+</div>
+<div class='articles'>
+	{{#unless data.length}}
+	<div class="alert alert-warning" role="alert">
+		<p style="text-align: center;"><strong>Uh Oh!</strong> It doesn't look like you have any new articles</p>
+	</div>
+	{{/unless}}
+
+	{{#if data.length}}
+		{{#each data}}
+			<div>
+				<p>{{title}}</p>
+				<p>{{link}}</p>
+				<p>Description</p>
+			</div>
+		{{/each}} 
+	{{/if}}
+</div>
