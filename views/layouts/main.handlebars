@@ -13,29 +13,147 @@
 			<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 			</button>
-			<a class="navbar-brand" href="#">News Scraper</a>
+			<a class="navbar-brand" href="#">News Scraper<span id='random'></span></a>
 			<div class="collapse navbar-collapse" id="navbarSupportedContent">
 				<ul class="navbar-nav mr-auto">
 					<li class="nav-item active">
-						<a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+						<a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="#">Saved Articles</a>
+						<a class="nav-link" href="/savedArticles">Saved Articles</a>
 					</li>
 					<li>
 						<button id="scrape" class="btn btn-outline-success my-2 my-sm-0" type="button">Scrape News Articles</button>
+					</li>
+					<li>
+						<button id="clear" class="btn btn-outline-warning my-2 my-sm-0" type="button">Clear Articles</button>
 					</li>
 				</ul>
 			</div>
 		</nav>
 		{{{ body }}}
+		<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<h3 style='text-align: center;'>You scraped <span id='scrapeCount'></span> new article(s)</h3>
+					</div>
+					<div class="modal-footer">
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-labelledby="noteModalLabel" aria-hidden="true">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="noteModalLabel">Notes for Article: <span id='articleId'></span></h5>
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		          <span aria-hidden="true">&times;</span>
+		        </button>
+		      </div> 
+		      <div class="modal-body">
+		      	<div class="row">
+				  <div id="noteList" class="col-12">
+				  </div>
+		      </div>
+		        <div class="row">
+				  <div class="col-12">
+				    <div class="input-group">
+				      <input id='noteText' type="text" class="form-control" aria-label="Text input with checkbox">
+				    </div>
+				  </div>
+		      </div>
+		      <div class="modal-footer">
+		        <button id='saveNote' type="button" class="btn btn-primary" onClick="saveNote.call(this)">Save Note</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
 	</body>
 	<script type="text/javascript">
+
 		$('#scrape').on('click', () => {
-			alert('scraped');
+
 			$.get('/scrape', (data) => {
-				console.log(data);
+
+				$('#scrapeCount').text(data);
+				$('#exampleModalLong').modal('toggle');
+
+				$('#exampleModalLong').on('hidden.bs.modal', function () {
+        			location.reload();
+    			});
 			});
 		});
+
+		$('#clear').on('click', () => {
+			$.get('/clear', (data) => {
+        		location.reload();
+			});
+		});
+
+		function saveNote(e) {
+			const text = $('#noteText').val().trim();
+			const id $('#articleId').text();
+			
+			$.post('/saveNote', {id: id, text: text}, (result) => {
+				console.log(result);
+			});
+
+		}
+
+		function clickSave(e) {
+			$.post('/save', {data: $(this).data("value")}, (result) => {
+				if(result === true) {
+					$(this).remove();
+					location.reload();
+				}
+			});
+		}
+
+		function deleteSaved(e) {
+
+			$.post('/deleteArticle', {data: $(this).data("value")}, (result) => {
+				console.log(result);
+				if(result === true) {
+					$(this).remove();
+					location.reload();
+				}
+			});
+		}
+
+		function notes(e) {
+
+			$.post('/notes', {data: $(this).data("value")}, (result) => {
+				if(result.data.length === 0) {
+					$('#noteList').append(
+						'<div class="alert alert-info" role="alert">No notes for this article yet.</div>');
+				} else {
+					console.log(result.data);
+				}
+
+				$('#articleId').text($(this).data("value"));
+				$('#noteModal').modal('toggle');
+
+				// if(result === true) {
+				// 	$(this).remove();
+				// 	location.reload();
+				// }
+			});
+		}
+
+		// notes modal
+			// push new notes to db
+			// delete notes from db
+
+		//deploy to heroku
+
 	</script>
 </html>

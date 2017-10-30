@@ -1,7 +1,6 @@
 <div class="jumbotron jumbotron-fluid">
 	<div class="container">
-		<h1 class="display-3">News Scraper</h1>
-		<p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.</p>
+		<h1 class="display-3" style="text-align: center;">News Scraper</h1>
 	</div>
 </div>
 <div class='articles'>
@@ -10,14 +9,15 @@
 		<p style="text-align: center;"><strong>Uh Oh!</strong> It doesn't look like you have any new articles</p>
 	</div>
 	{{/unless}}
-
-	{{#if data.length}}
+	{{#if data.length}}		
 		{{#each data}}
-			<div>
-				<p>{{title}}</p>
-				<p>{{link}}</p>
-				<p>Description</p>
-			</div>
-		{{/each}} 
+			{{#unless saved}}
+				<div class="alert alert-success" role="alert" style='text-align: center;'>
+					<h3><a href={{link}} class="alert-link">{{title}}</a></h3>
+					<p>{{summary}}</p>
+					<button class="save" type="button" class="btn btn-secondary" data-value={{_id}} onClick="clickSave.call(this)">Save Article</button>
+				</div>
+			{{/unless}}
+		{{/each}}		
 	{{/if}}
 </div>
