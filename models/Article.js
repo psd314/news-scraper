@@ -21,10 +21,12 @@ const ArticleSchema = new Schema({
         type: Boolean,
         default: false
     },
-    note: {
-        type: Schema.Types.ObjectId,
-        ref: "Note"
-    }
+    notes: [{
+    // Store ObjectIds in the array
+    type: Schema.Types.ObjectId,
+    // The ObjectIds will refer to the ids in the Note model
+    ref: "Note"
+  }]
 });
 
 const Article = mongoose.model("Article", ArticleSchema);

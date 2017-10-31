@@ -101,10 +101,12 @@
 
 		function saveNote(e) {
 			const text = $('#noteText').val().trim();
-			const id $('#articleId').text();
-			
-			$.post('/saveNote', {id: id, text: text}, (result) => {
+			const id = $('#articleId').text();
+
+			$.post('/saveNote', {id: id, body: text}, (result) => {
 				console.log(result);
+				$('#noteText').val('');
+				// load notes from db
 			});
 
 		}
@@ -133,7 +135,7 @@
 
 			$.post('/notes', {data: $(this).data("value")}, (result) => {
 				if(result.data.length === 0) {
-					$('#noteList').append(
+					$('#noteList').empty().append(
 						'<div class="alert alert-info" role="alert">No notes for this article yet.</div>');
 				} else {
 					console.log(result.data);

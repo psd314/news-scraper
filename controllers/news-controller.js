@@ -21,7 +21,7 @@ db.once("open", function() {
     console.log("Mongoose connection successful.");
 });
 
-router.get("/", function(req, res) {
+router.get("/", (req, res) => {
     Article.find({}, function(error, doc) {
 
         let savedCheck = 0;
@@ -46,12 +46,12 @@ router.get("/", function(req, res) {
     });
 });
 
-router.get("/scrape", function(req, res) {
+router.get("/scrape", (req, res) => {
     request("http://www.nytimes.com", function(error, response, html) {
         const $ = cheerio.load(html);
         const results = [];
 
-        $(".story-heading").each(function(i, element) {
+        $(".story-heading").each((i, element) => {
 
             const articleTitle = $(element).text().trim();
             const articleLink = $(element).children().attr("href");
@@ -122,6 +122,8 @@ router.post('/deleteArticle', (req, res) => {
 router.post('/notes', (req, res) => {
     console.log(req.body.data);
 
+    Article.find({note})
+
     Note.find({
         _id: req.body.data
     }, (error, docs) => {
@@ -132,7 +134,7 @@ router.post('/notes', (req, res) => {
                 data: []
             };
             error ? console.error(error) : res.json(hbsObj);
-        } 
+        }
         // else {
         //     hbsObj = {
         //         data: doc
@@ -140,39 +142,39 @@ router.post('/notes', (req, res) => {
         //     error ? console.error(error) : res.render("index", hbsObj);
         // }
     });
-    // var newNote = new Note(req.body);
-
-    // // And save the new note the db
-    // newNote.save(function(error, doc) {
-    //     // Log any errors
-    //     if (error) {
-    //         console.log(error);
-    //     }
-    //     // Otherwise
-    //     else {
-    //         // Use the article id to find and update it's note
-    //         Article.findOneAndUpdate({
-    //                 "_id": req.params.id
-    //             }, {
-    //                 "note": doc._id
-    //             })
-    //             // Execute the above query
-    //             .exec(function(err, doc) {
-    //                 // Log any errors
-    //                 if (err) {
-    //                     console.log(err);
-    //                 } else {
-    //                     // Or send the document to the browser
-    //                     res.send(doc);
-    //                 }
-    //             });
-    //     }
-    // });
-    // res.json(true);
 });
 
-router.post('/saveNote', (req, res) => {
+router.post('/saveNote/', (req, res) => {
     console.log(req.body);
+    console.log(req.body.body);
+
+    var newNote = new Note({
+        body: req.body.body
+    });
+
+    newNote.save((err, doc) => {
+        if (err) {
+            console.error(err)
+        } else {
+
+            Article.findOneAndUpdate({}, {
+                $push: {
+                    "notes": doc._id
+                }
+            }, {
+                new: true
+            }, function(err, newdoc) {
+                // Send any errors to the browser
+                if (err) {
+                    res.send(err);
+                }
+                // Or send the newdoc to the browser
+                else {
+                    res.send(newdoc);
+                }
+            });
+        }
+    });
 });
 
 module.exports = router;
