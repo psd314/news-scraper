@@ -10,7 +10,8 @@ mongoose.Promise = Promise;
 const Article = require("../models/Article.js");
 const Note = require("../models/Note.js");
 
-mongoose.connect("mongodb://localhost/news");
+// mongoose.connect("mongodb://localhost/news");
+mongoose.connect("mongodb://heroku_dvnqbx34:1jf5vcnjc994kqgr914o6uusj6@ds243295.mlab.com:43295/heroku_dvnqbx34");
 const db = mongoose.connection;
 
 db.on("error", function(error) {
