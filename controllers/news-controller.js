@@ -67,9 +67,7 @@ router.get("/scrape", (req, res) => {
         });
 
         Article.insertMany(results)
-            .then(function(docs) {
-                // console.log(docs);
-            })
+            .then(function(docs) {})
             .catch(function(err) {
                 console.error(err);
             });
@@ -86,7 +84,7 @@ router.post("/save", function(req, res) {
             saved: true
         }
     }).exec(function(err, doc) {
-        (err) ? console.log(err): res.json(true);
+        (err) ? console.error(err): res.json(true);
     });
 });
 
@@ -111,7 +109,6 @@ router.get('/savedArticles', (req, res) => {
 });
 
 router.post('/deleteArticle', (req, res) => {
-    console.log(req.body.data);
     Article.remove({
         _id: req.body.data
     }, (err, docs) => {
@@ -120,34 +117,20 @@ router.post('/deleteArticle', (req, res) => {
 });
 
 router.post('/notes', (req, res) => {
-    console.log(req.body.data);
-
-    Article.find({note})
-
-    Note.find({
-        _id: req.body.data
-    }, (error, docs) => {
-        console.log('Docs', docs);
-
-        if (docs.length === 0) {
-            hbsObj = {
-                data: []
-            };
-            error ? console.error(error) : res.json(hbsObj);
-        }
-        // else {
-        //     hbsObj = {
-        //         data: doc
-        //     };
-        //     error ? console.error(error) : res.render("index", hbsObj);
-        // }
-    });
+    Article.find({
+            _id: req.body.data
+        })
+        .populate("notes")
+        .exec(function(error, popDoc) {
+            if (error) {
+                res.send(error);
+            } else {
+                res.send(popDoc);
+            }
+        });
 });
 
 router.post('/saveNote/', (req, res) => {
-    console.log(req.body);
-    console.log(req.body.body);
-
     var newNote = new Note({
         body: req.body.body
     });
@@ -163,17 +146,39 @@ router.post('/saveNote/', (req, res) => {
                 }
             }, {
                 new: true
-            }, function(err, newdoc) {
-                // Send any errors to the browser
+            }, (err, newdoc) => {
                 if (err) {
                     res.send(err);
-                }
-                // Or send the newdoc to the browser
-                else {
-                    res.send(newdoc);
+                } else {
+                    Article.find({
+                            _id: req.body.id
+                        })
+                        .populate("notes")
+                        .exec(function(error, popDoc) {
+                            if (error) {
+                                res.send(error);
+                            } else {
+                                res.send(popDoc);
+                            }
+                        });
                 }
             });
         }
+    });
+});
+
+router.post('/deleteNote', (req, res) => {
+
+    Note.remove({
+        _id: req.body.noteId
+    }, (err, docs) => {
+    });
+
+    Article.update({
+        _id: req.body.articleId },
+        {$pull : {notes : req.body.noteId}
+    }, (err, docs) => {
+        res.json(true);
     });
 });
 

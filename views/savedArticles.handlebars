@@ -11,12 +11,12 @@
 	{{/unless}}
 	{{#if data.length}}
 		{{#each data}}
-			<div class="alert alert-success" role="alert" style='text-align: center;'>
-				<h3><a href={{link}} class="alert-link">{{title}}</a></h3>
-				<p>{{summary}}</p>
-				<button class="delete" type="button" class="btn btn-secondary" data-value={{_id}} onClick="notes.call(this)">Article Notes</button>
-				<button class="delete" type="button" class="btn btn-secondary" data-value={{_id}} onClick="deleteSaved.call(this)">Delete From Saved</button>
-			</div>
+		<div class="alert alert-success" role="alert" style='text-align: center;'>
+			<h3><a href={{link}} class="alert-link">{{title}}</a></h3>
+			<p>{{summary}}</p>
+			<button class="delete" type="button" class="btn btn-secondary" data-value={{_id}} onClick="notes.call(this)">Article Notes</button>
+			<button class="delete" type="button" class="btn btn-secondary" data-value={{_id}} onClick="deleteSaved.call(this)">Delete From Saved</button>
+		</div>
 		{{/each}}
 	{{/if}}
 </div>

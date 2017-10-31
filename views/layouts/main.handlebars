@@ -7,6 +7,7 @@
 		<script src="https://code.jquery.com/jquery.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+		<script src="https://use.fontawesome.com/9b186a5162.js"></script>
 	</head>
 	<body>
 		<nav class="navbar navbar-toggleable-md navbar-light bg-faded">
@@ -26,7 +27,7 @@
 						<button id="scrape" class="btn btn-outline-success my-2 my-sm-0" type="button">Scrape News Articles</button>
 					</li>
 					<li>
-						<button id="clear" class="btn btn-outline-warning my-2 my-sm-0" type="button">Clear Articles</button>
+						<button id="clear" class="btn btn-outline-warning my-2 my-sm-0" type="button">Clear Scraped Articles</button>
 					</li>
 				</ul>
 			</div>
@@ -104,13 +105,13 @@
 			const id = $('#articleId').text();
 
 			$.post('/saveNote', {id: id, body: text}, (result) => {
-				console.log(result);
+
 				$('#noteText').val('');
-				// load notes from db
+				$('#noteModal').modal('toggle');
 			});
 
 		}
-
+		// save article
 		function clickSave(e) {
 			$.post('/save', {data: $(this).data("value")}, (result) => {
 				if(result === true) {
@@ -134,28 +135,36 @@
 		function notes(e) {
 
 			$.post('/notes', {data: $(this).data("value")}, (result) => {
-				if(result.data.length === 0) {
+
+				if(result[0].notes.length === 0) {
 					$('#noteList').empty().append(
 						'<div class="alert alert-info" role="alert">No notes for this article yet.</div>');
 				} else {
-					console.log(result.data);
+					var notesHtml = '';
+					for(var i = 0; i < result[0].notes.length; i++) {
+						notesHtml += `<div class="alert alert-info" role="alert" data-value=${result[0].notes[i]._id}><i class="fa fa-trash-o" aria-hidden="true" onClick='deleteNote.call(this)'></i>&nbsp${result[0].notes[i].body}</div>`;
+					}
+					$('#noteList').empty().append(notesHtml);
 				}
-
 				$('#articleId').text($(this).data("value"));
 				$('#noteModal').modal('toggle');
-
-				// if(result === true) {
-				// 	$(this).remove();
-				// 	location.reload();
-				// }
 			});
 		}
 
-		// notes modal
-			// push new notes to db
-			// delete notes from db
-
-		//deploy to heroku
+		function deleteNote() {			
+			console.log($('#articleId').html());
+			$.post('/deleteNote', {articleId:$('#articleId').html(), noteId: $(this).parent()[0].dataset.value}, 
+				(result) => {
+				// console.log(result);
+				// if(result === true) {
+					// $(this).remove();
+					// location.reload();
+				// }
+				$('#noteModal').modal('toggle');
+			});
+			// delete note in db
+			// toggle modal on delete
+		}
 
 	</script>
 </html>
